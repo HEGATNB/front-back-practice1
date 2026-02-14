@@ -1,0 +1,257 @@
+$primary-color: #3498db;
+$secondary-color: #95a5a6;
+$success-color: #2ecc71;
+$danger-color: #e74c3c;
+$warning-color: #f39c12;
+$text-color: #333;
+$bg-color: #f9f9f9;
+$border-color: #ddd;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: $bg-color;
+    color: $text-color;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: darken($primary-color, 20%);
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: $text-color;
+    font-size: 1.5rem;
+}
+
+.form-container {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+
+    #form-title {
+        color: $primary-color;
+    }
+}
+
+.form-group {
+    margin-bottom: 15px;
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        font-size: 1rem;
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 5px rgba($primary-color, 0.3);
+        }
+
+        &.error {
+            border-color: $danger-color;
+        }
+    }
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &-primary {
+        background-color: $primary-color;
+        color: white;
+
+        &:hover {
+            background-color: darken($primary-color, 10%);
+        }
+    }
+
+    &-secondary {
+        background-color: $secondary-color;
+        color: white;
+
+        &:hover {
+            background-color: darken($secondary-color, 10%);
+        }
+    }
+
+    &-edit {
+        background-color: $warning-color;
+        color: white;
+    }
+
+    &-delete {
+        background-color: $danger-color;
+        color: white;
+    }
+
+    &-small {
+        padding: 5px 10px;
+        font-size: 0.9rem;
+    }
+}
+
+.products-container {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    padding: 15px;
+    transition: all 0.3s;
+    position: relative;
+
+    &:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+    }
+
+    &__title {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        color: $text-color;
+        padding-right: 60px;
+    }
+
+    &__price {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: $primary-color;
+        margin-bottom: 15px;
+
+        &::before {
+            content: '$';
+            font-size: 1rem;
+            margin-right: 2px;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        gap: 5px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    animation: slideIn 0.3s ease;
+
+    &-success {
+        background-color: rgba($success-color, 0.2);
+        border: 1px solid $success-color;
+        color: darken($success-color, 20%);
+    }
+
+    &-error {
+        background-color: rgba($danger-color, 0.2);
+        border: 1px solid $danger-color;
+        color: darken($danger-color, 20%);
+    }
+
+    &-info {
+        background-color: rgba($primary-color, 0.2);
+        border: 1px solid $primary-color;
+        color: darken($primary-color, 20%);
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: $secondary-color;
+    font-style: italic;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
