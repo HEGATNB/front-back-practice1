@@ -2,6 +2,23 @@ class ProductAPI {
     constructor() {
         this.storageKey = 'products';
         this.products = this.loadProducts();
+
+        // Добавляем товары по умолчанию, если список пуст
+        if (this.products.length === 0) {
+            this.seedDefaultProducts();
+        }
+    }
+
+    seedDefaultProducts() {
+        const defaultProducts = [
+            { name: 'Фигурка Человек-паук', price: 5990 },
+            { name: 'Фигурка Халк', price: 7490 },
+            { name: 'Фигурка Железный человек', price: 5790 }
+        ];
+
+        defaultProducts.forEach(product => {
+            this.create(product);
+        });
     }
 
     loadProducts() {
@@ -115,7 +132,7 @@ class UI {
         this.productPrice.value = product.price;
         this.submitBtn.textContent = 'Обновить';
         this.formTitle.textContent = 'Редактировать товар';
-        this.cancelBtn.style.display = 'block';
+        this.cancelBtn.style.display = 'inline-block';
 
         this.form.scrollIntoView({ behavior: 'smooth' });
     }
@@ -129,7 +146,6 @@ class UI {
                 this.showMessage(`Товар "${product.name}" удален`, 'info');
                 this.renderProducts();
 
-                // Сброс формы если удалили редактируемый товар
                 if (this.currentEditId === id) {
                     this.resetForm();
                 }
@@ -147,12 +163,18 @@ class UI {
 
         this.productsList.innerHTML = products.map(product => `
             <div class="product-card">
-                <div class="product-card__actions">
-                    <button class="btn btn-edit btn-small" onclick="ui.handleEdit('${product.id}')">✎</button>
-                    <button class="btn btn-delete btn-small" onclick="ui.handleDelete('${product.id}')">×</button>
+                <div class="product-card__header">
+                    <h3 class="product-card__title">${this.escapeHtml(product.name)}</h3>
+                    <div class="product-card__price">$${product.price.toFixed(2)}</div>
                 </div>
-                <h3 class="product-card__title">${this.escapeHtml(product.name)}</h3>
-                <div class="product-card__price">${product.price.toFixed(2)}</div>
+                <div class="product-card__actions">
+                    <button class="btn btn-edit" onclick="ui.handleEdit('${product.id}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-delete" onclick="ui.handleDelete('${product.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
         `).join('');
     }
