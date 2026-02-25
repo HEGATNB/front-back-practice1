@@ -2,7 +2,7 @@
 
 ## Структура проекта
 
-front-back-practice1/
+front-back-practice1/<br>
 ├── Practice1/              # Практическое задание 1<br>
 ├── Practice2/              # Практическое задание 2<br>
 ├── Practice3/              # Практическое задание 3<br>
