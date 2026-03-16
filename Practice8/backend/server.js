@@ -9,20 +9,17 @@ const productRoutes = require('./routes/products');
 const app = express();
 const port = 3000;
 
-// Настройка CORS - разрешаем все необходимые заголовки
 app.use(cors({
   origin: 'http://localhost:3001',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'user-id'] // Добавлен user-id
+  allowedHeaders: ['Content-Type', 'Authorization', 'user-id']
 }));
 
-// Для обработки preflight запросов OPTIONS
 app.options('*', cors());
 
 app.use(express.json());
 
-// Swagger документация
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
