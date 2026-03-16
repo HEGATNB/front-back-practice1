@@ -2,14 +2,14 @@
 
 ## Структура проекта
 
-front-back-practice1/
-├── Practice1/ # Практическое задание 1
-├── Practice2/ # Практическое задание 2
-├── Practice3/ # Практическое задание 3
-├── Practice4/ # Практическое задание 4-5
-│ ├── frontend/ # React + Vite (фронтенд)
-│ └── backend/ # Express (бэкенд)
-└── README.md
+front-back-practice1/<br>
+├── Practice1/ # Практическое задание 1<br>
+├── Practice2/ # Практическое задание 2<br>
+├── Practice3/ # Практическое задание 3<br>
+├── Practice4/ # Практическое задание 4-5<br>
+│ ├── frontend/ # React + Vite (фронтенд)<br>
+│ └── backend/ # Express (бэкенд)<br>
+└── README.md<br>
 
 
 ---
