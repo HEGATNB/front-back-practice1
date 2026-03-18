@@ -1,10 +1,8 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 const { authenticateToken, authorize } = require('../middleware/auth');
+const { users } = require('../data/db');
 
 const router = express.Router();
-
-const { users } = require('../data/db');
 
 /**
  * @swagger
@@ -94,8 +92,6 @@ router.get('/:id', authenticateToken, authorize('admin'), (req, res) => {
  *               role:
  *                 type: string
  *                 enum: [user, seller, admin]
- *               isBlocked:
- *                 type: boolean
  *     responses:
  *       200:
  *         description: Пользователь обновлен
@@ -113,19 +109,17 @@ router.put('/:id', authenticateToken, authorize('admin'), async (req, res) => {
       return res.status(404).json({ error: 'Пользователь не найден' });
     }
 
-    const { first_name, last_name, email, role, isBlocked } = req.body;
+    const { first_name, last_name, email, role } = req.body;
 
     if (users[userIndex].role === 'admin' && role !== 'admin' && req.user.id !== users[userIndex].id) {
       return res.status(403).json({ error: 'Нельзя изменить роль администратора' });
     }
+
     if (first_name) users[userIndex].first_name = first_name;
     if (last_name) users[userIndex].last_name = last_name;
     if (email) users[userIndex].email = email;
     if (role && req.user.id !== users[userIndex].id) {
       users[userIndex].role = role;
-    }
-    if (isBlocked !== undefined && req.user.id !== users[userIndex].id) {
-      users[userIndex].isBlocked = isBlocked;
     }
 
     users[userIndex].updated_at = new Date().toISOString();
@@ -140,9 +134,9 @@ router.put('/:id', authenticateToken, authorize('admin'), async (req, res) => {
 
 /**
  * @swagger
- * /api/users/{id}:
- *   delete:
- *     summary: Заблокировать пользователя (только для администраторов)
+ * /api/users/{id}/toggle-block:
+ *   patch:
+ *     summary: Заблокировать/разблокировать пользователя (только для администраторов)
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -154,7 +148,51 @@ router.put('/:id', authenticateToken, authorize('admin'), async (req, res) => {
  *           type: string
  *     responses:
  *       200:
- *         description: Пользователь заблокирован
+ *         description: Статус пользователя изменен
+ *       401:
+ *         description: Не авторизован
+ *       403:
+ *         description: Недостаточно прав
+ *       404:
+ *         description: Пользователь не найден
+ */
+router.patch('/:id/toggle-block', authenticateToken, authorize('admin'), (req, res) => {
+  const userIndex = users.findIndex(u => u.id === req.params.id);
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'Пользователь не найден' });
+  }
+
+  if (users[userIndex].id === req.user.id) {
+    return res.status(403).json({ error: 'Нельзя заблокировать самого себя' });
+  }
+
+  users[userIndex].isBlocked = !users[userIndex].isBlocked;
+  users[userIndex].updated_at = new Date().toISOString();
+
+  const { password, ...userWithoutPassword } = users[userIndex];
+  res.json({
+    ...userWithoutPassword,
+    message: users[userIndex].isBlocked ? 'Пользователь заблокирован' : 'Пользователь разблокирован'
+  });
+});
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Удалить пользователя (только для администраторов)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Пользователь удален
  *       401:
  *         description: Не авторизован
  *       403:
@@ -169,13 +207,16 @@ router.delete('/:id', authenticateToken, authorize('admin'), (req, res) => {
   }
 
   if (users[userIndex].id === req.user.id) {
-    return res.status(403).json({ error: 'Нельзя заблокировать самого себя' });
+    return res.status(403).json({ error: 'Нельзя удалить самого себя' });
   }
 
-  users[userIndex].isBlocked = true;
-  users[userIndex].updated_at = new Date().toISOString();
+  const deletedUser = users.splice(userIndex, 1)[0];
+  const { password, ...userWithoutPassword } = deletedUser;
 
-  res.json({ message: 'Пользователь заблокирован' });
+  res.json({
+    message: 'Пользователь удален',
+    user: userWithoutPassword
+  });
 });
 
 module.exports = router;

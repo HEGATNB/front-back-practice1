@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { auth } from '../api';
 import Header from '../components/Header';
@@ -11,7 +11,15 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('blocked') === 'true') {
+      setError('Ваш аккаунт был заблокирован. Обратитесь к администратору.');
+    }
+  }, [location]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,31 +27,25 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      console.log('Attempting login with:', { email });
-
       const response = await auth.login({ email, password });
-      console.log('Login response full:', response);
-      console.log('Login response data:', response.data);
 
       const { accessToken, refreshToken, ...userData } = response.data;
 
       if (userData && userData.id) {
-        console.log('Login successful, user:', userData);
         login(userData);
-
         navigate('/products');
-      } else {
-        console.error('Invalid response structure:', response.data);
-        setError('Неверный формат ответа от сервера');
       }
     } catch (err) {
-      console.error('Login error full:', err);
-      console.error('Login error response:', err.response);
+      console.error('Login error:', err);
 
       if (err.code === 'ERR_NETWORK') {
         setError('Не удалось подключиться к серверу. Убедитесь, что бэкенд запущен на порту 3000');
       } else if (err.response) {
-        setError(err.response.data?.error || `Ошибка ${err.response.status}`);
+        if (err.response.status === 403 && err.response.data?.error?.includes('заблокирован')) {
+          setError('Ваш аккаунт заблокирован. Обратитесь к администратору.');
+        } else {
+          setError(err.response.data?.error || `Ошибка ${err.response.status}`);
+        }
       } else {
         setError('Ошибка при входе');
       }

@@ -7,7 +7,7 @@ const router = express.Router();
 
 const JWT_SECRET = 'your-super-secret-jwt-key-change-this-in-production';
 const REFRESH_SECRET = 'your-super-secret-refresh-key-change-this-in-production';
-const TOKEN_EXPIRES_IN = '15m';
+const TOKEN_EXPIRES_IN = '6s';
 const REFRESH_TOKEN_EXPIRES_IN = '7d';
 
 let users = [];

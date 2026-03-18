@@ -171,7 +171,7 @@ const ProductsPage = () => {
       <main className="main">
         <div className="container">
           <div className="toolbar">
-            <h1 className="title">🏄 Каталог серфинга</h1>
+            <h1 className="title"> Каталог серфинга</h1>
             {isSeller() && (
               <button
                 className="btn btn--primary"

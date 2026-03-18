@@ -14,7 +14,6 @@ const UsersPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Проверка прав доступа
     if (!isAdmin()) {
       navigate('/products');
       return;
@@ -57,21 +56,36 @@ const UsersPage = () => {
     }
   };
 
-  const handleBlockUser = async (userId) => {
-    if (!window.confirm('Вы уверены, что хотите заблокировать этого пользователя?')) {
+  const handleToggleBlock = async (userId, currentStatus) => {
+    const action = currentStatus ? 'разблокировать' : 'заблокировать';
+    if (!window.confirm(`Вы уверены, что хотите ${action} этого пользователя?`)) {
       return;
     }
 
     try {
-      await usersApi.block(userId);
-      // Обновляем статус пользователя в списке
+      const response = await usersApi.toggleBlock(userId);
       setUsers(prev => prev.map(u =>
-        u.id === userId ? { ...u, isBlocked: true } : u
+        u.id === userId ? { ...u, isBlocked: !u.isBlocked } : u
       ));
       setError('');
     } catch (err) {
-      console.error('Error blocking user:', err);
-      setError('Ошибка при блокировке пользователя');
+      console.error('Error toggling user block:', err);
+      setError('Ошибка при изменении статуса пользователя');
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Вы уверены, что хотите удалить этого пользователя? Это действие нельзя отменить.')) {
+      return;
+    }
+
+    try {
+      await usersApi.delete(userId);
+      setUsers(prev => prev.filter(u => u.id !== userId));
+      setError('');
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      setError('Ошибка при удалении пользователя');
     }
   };
 
@@ -92,7 +106,7 @@ const UsersPage = () => {
   };
 
   if (!isAdmin()) {
-    return null; // Перенаправление произойдет в useEffect
+    return null;
   }
 
   return (
@@ -102,7 +116,7 @@ const UsersPage = () => {
       <main className="main">
         <div className="container">
           <div className="toolbar">
-            <h1 className="title">👥 Управление пользователями</h1>
+            <h1 className="title"> Управление пользователями</h1>
             <button className="btn" onClick={() => navigate('/products')}>
               ← К товарам
             </button>
@@ -152,26 +166,31 @@ const UsersPage = () => {
                     )}
                   </div>
                   <div className="users-table__cell users-table__actions">
-                    {user.id !== currentUser?.id && (
+                    {user.id !== currentUser?.id ? (
                       <>
                         <button
                           className="btn btn--primary"
                           onClick={() => handleEdit(user)}
-                          disabled={user.isBlocked}
+                          title="Редактировать"
                         >
                           ✏️
                         </button>
-                        {!user.isBlocked && (
-                          <button
-                            className="btn btn--danger"
-                            onClick={() => handleBlockUser(user.id)}
-                          >
-                            🔒
-                          </button>
-                        )}
+                        <button
+                          className={`btn ${user.isBlocked ? 'btn--success' : 'btn--danger'}`}
+                          onClick={() => handleToggleBlock(user.id, user.isBlocked)}
+                          title={user.isBlocked ? 'Разблокировать' : 'Заблокировать'}
+                        >
+                          {user.isBlocked ? '🔓' : '🔒'}
+                        </button>
+                        <button
+                          className="btn btn--danger"
+                          onClick={() => handleDeleteUser(user.id)}
+                          title="Удалить"
+                        >
+                          🗑️
+                        </button>
                       </>
-                    )}
-                    {user.id === currentUser?.id && (
+                    ) : (
                       <span className="badge">Это вы</span>
                     )}
                   </div>
@@ -182,7 +201,6 @@ const UsersPage = () => {
         </div>
       </main>
 
-      {/* Модальное окно редактирования пользователя */}
       {showEditModal && editingUser && (
         <div className="backdrop" onClick={() => setShowEditModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
@@ -243,13 +261,31 @@ const UsersPage = () => {
                   </select>
                 </label>
 
-                <div className="modal__footer">
-                  <button type="button" className="btn" onClick={() => setShowEditModal(false)}>
-                    Отмена
-                  </button>
-                  <button type="submit" className="btn btn--primary">
-                    Сохранить
-                  </button>
+                <div className="modal__footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    {editingUser.id !== currentUser?.id && (
+                      <button
+                        type="button"
+                        className="btn btn--danger"
+                        onClick={() => {
+                          if (window.confirm('Вы уверены, что хотите удалить этого пользователя? Это действие нельзя отменить.')) {
+                            handleDeleteUser(editingUser.id);
+                            setShowEditModal(false);
+                          }
+                        }}
+                      >
+                        🗑️ Удалить пользователя
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button type="button" className="btn" onClick={() => setShowEditModal(false)}>
+                      Отмена
+                    </button>
+                    <button type="submit" className="btn btn--primary">
+                      Сохранить
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>

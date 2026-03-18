@@ -38,6 +38,17 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (error.response?.status === 403 && error.response?.data?.error?.includes('заблокирован')) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login?blocked=true';
+      }
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 403 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -141,7 +152,8 @@ export const users = {
   getAll: () => api.get('/users'),
   getById: (id) => api.get(`/users/${id}`),
   update: (id, data) => api.put(`/users/${id}`, data),
-  block: (id) => api.delete(`/users/${id}`),
+  toggleBlock: (id) => api.patch(`/users/${id}/toggle-block`),
+  delete: (id) => api.delete(`/users/${id}`),
 };
 
 export default api;

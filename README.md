@@ -181,3 +181,121 @@ curl http://localhost:3000/api/products
 Откройте в браузере http://localhost:3001
 
 ---
+
+# Практические задания 7-11
+
+## Структура проекта
+
+
+front-back-practice/<br>
+├── Practice7/                 # Практическое задание 7 - Базовая аутентификация<br>
+│   └── frontend               # Простой фронтэнд<br>
+│   └── backend                # Express сервер с bcrypt<br>
+├── Practice8/                 # Практическое задание 8 - JWT токены<br>
+│   └── frontend               # Простой фронтэнд<br>
+│   └── backend                # Express сервер с JWT<br>
+├── Practice9-10/              # Практические задания 9-10 - Фронтенд + Токены<br>
+│   ├── frontend/              # React + Vite (фронтенд)<br>
+│   └── backend/               # Express (бэкенд с JWT и refresh токенами)<br>
+├── Practice11/                # Практическое задание 11 - RBAC<br>
+│   ├── frontend/              # React + Vite (фронтенд с ролями)<br>
+│   └── backend/               # Express (бэкенд с RBAC)<br>
+└── README.md<br>
+
+
+В результате выполнения практических работ были выполнены следующие задания:
+
+## Практическое задание 7 — Базовая аутентификация с bcrypt
+
+Express-сервер с регистрацией и входом, хешированием паролей через bcrypt.
+
+Технологии: Node.js, Express, bcrypt, nanoid, Swagger
+
+### Api Эндпоинты
+
+|Метод|URL|Описание|
+|-------|-----|----------|
+|POST|	/api/auth/register|	Регистрация пользователя|
+|POST|	/api/auth/login|	Вход в систему|
+|POST|	/api/products|	Создать товар|
+|GET|	/api/products|	Получить список товаров|
+|GET|	/api/products/:id|	Получить товар по ID|
+|PUT|	/api/products/:id|	Обновить товар|
+|DELETE|	/api/products/:id|	Удалить товар|
+
+## Практическое задание 8 — JWT токены
+
+Доработка сервера из задания 7: добавлена выдача JWT токена при входе и защищённый маршрут /api/auth/me.
+
+Технологии: Node.js, Express, bcrypt, jsonwebtoken, nanoid, Swagger
+
+### Api Эндпоинты
+
+|Метод|URL|Описание|
+|-------|-----|---------|
+|POST|	/api/auth/register|	Регистрация|
+|POST|	/api/auth/login|	Вход|
+|GET|	/api/auth/me|	Текущий пользователь|
+|POST|	/api/products|	Создать товар|
+|GET|	/api/products|	Список товаров|
+|GET|	/api/products/:id|	Товар по ID|
+|PUT|	/api/products/:id|	Обновить товар|
+|DELETE|	/api/products/:id|	Удалить товар|
+
+## Практическое задание 9-10 — React-клиент + Refresh токены
+
+Полноценное SPA-приложение на React, подключённое к Express-серверу с поддержкой refresh-токенов и автоматическим обновлением токенов.
+Бэкенд (backend/)
+
+Express-сервер с поддержкой пары токенов (access + refresh).<br>
+
+|Метод|URL|Описание|
+|-------|-----|---------|
+|POST	|/api/auth/register|	Регистрация пользователя|
+|POST|	/api/auth/login	Вход в систему|
+|POST|	/api/auth/refresh|	Обновление пары токенов|
+|POST|	/api/auth/logout|	Выход из системы|
+|GET|	/api/auth/me|	Получение информации о текущем пользователе|
+|POST|	/api/products|	Создать товар|
+|GET|	/api/products|	Получить список товаров|
+|GET|	/api/products/:id|	Получить товар по ID|
+|PUT|	/api/products/:id|	Обновить товар|
+|DELETE|	/api/products/:id|	Удалить товар|
+
+
+Хранение данных
+
+    Пользователи и товары хранятся в памяти (массивы)
+
+    Refresh токены хранятся в Set для возможности инвалидации
+
+Токены
+
+    Access token: 15 минут
+
+    Refresh token: 7 дней
+
+    Refresh token хранится на сервере, при обновлении старая пара токенов сбрасывается
+
+
+Технологии: React, Vite, Axios, React Router, SCSS
+
+### Структура фронтенда
+
+frontend/src/<br>
+├── api.js                 # Axios клиент с перехватчиками<br>
+├── App.js                 # Роутинг<br>
+├── context/<br>
+│   └── AuthContext.jsx    # Контекст аутентификации<br>
+├── components/<br>
+│   ├── Header.jsx         # Шапка с навигацией<br>
+│   ├── PrivateRoute.jsx   # Защита маршрутов<br>
+│   ├── ProductCard.jsx    # Карточка товара<br>
+│   └── ProductForm.jsx    # Форма товара<br>
+├── pages/<br>
+│   ├── LoginPage.jsx      # Страница входа<br>
+│   ├── RegisterPage.jsx   # Страница регистрации<br>
+│   └── ProductsPage.jsx   # Страница товаров<br>
+└── styles/<br>
+    └── App.scss           # Стили
+

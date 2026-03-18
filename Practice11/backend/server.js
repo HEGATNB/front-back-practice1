@@ -13,7 +13,7 @@ const port = 3000;
 app.use(cors({
   origin: 'http://localhost:3001',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'user-id']
 }));
 
@@ -74,7 +74,8 @@ app.get('/', (req, res) => {
       <li>GET /api/users - список пользователей (Админ)</li>
       <li>GET /api/users/:id - пользователь по ID (Админ)</li>
       <li>PUT /api/users/:id - обновить пользователя (Админ)</li>
-      <li>DELETE /api/users/:id - заблокировать пользователя (Админ)</li>
+      <li>PATCH /api/users/:id/toggle-block - заблокировать/разблокировать (Админ)</li>
+      <li>DELETE /api/users/:id - удалить пользователя (Админ)</li>
     </ul>
     <p><strong>Тестовые пользователи:</strong></p>
     <ul>

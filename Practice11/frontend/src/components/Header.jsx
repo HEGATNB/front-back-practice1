@@ -37,8 +37,8 @@ const Header = () => {
                       padding: '2px 8px',
                       borderRadius: '12px'
                     }}>
-                      {user.role === 'admin' ? '👑 Админ' :
-                       user.role === 'seller' ? '🛒 Продавец' : '👤 Пользователь'}
+                      {user.role === 'admin' ? '⭐ Админ' :
+                       user.role === 'seller' ? '💰 Продавец' : '👤 Пользователь'}
                     </span>
                   )}
                 </span>

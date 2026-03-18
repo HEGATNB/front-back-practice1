@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const { nanoid } = require('nanoid');
 const jwt = require('jsonwebtoken');
 const { authenticateToken } = require('../middleware/auth');
+const { users } = require('../data/db');
 
 const router = express.Router();
 
@@ -11,12 +12,11 @@ const REFRESH_SECRET = 'your-super-secret-refresh-key-change-this-in-production'
 const TOKEN_EXPIRES_IN = '15m';
 const REFRESH_TOKEN_EXPIRES_IN = '7d';
 
-let users = [];
 let refreshTokens = new Set();
 
-// Создаем тестовых пользователей с разными ролями
 const createTestUsers = async () => {
-  // Обычный пользователь
+  users.length = 0;
+
   const hashedPasswordUser = await bcrypt.hash('password123', 10);
   const testUser = {
     id: nanoid(),
@@ -30,7 +30,6 @@ const createTestUsers = async () => {
   };
   users.push(testUser);
 
-  // Продавец
   const hashedPasswordSeller = await bcrypt.hash('seller123', 10);
   const testSeller = {
     id: nanoid(),
@@ -44,7 +43,6 @@ const createTestUsers = async () => {
   };
   users.push(testSeller);
 
-  // Администратор
   const hashedPasswordAdmin = await bcrypt.hash('admin123', 10);
   const testAdmin = {
     id: nanoid(),
@@ -72,7 +70,8 @@ const generateAccessToken = (user) => {
       email: user.email,
       role: user.role,
       first_name: user.first_name,
-      last_name: user.last_name
+      last_name: user.last_name,
+      isBlocked: user.isBlocked
     },
     JWT_SECRET,
     { expiresIn: TOKEN_EXPIRES_IN }
@@ -91,38 +90,6 @@ const generateRefreshToken = (user) => {
   );
 };
 
-/**
- * @swagger
- * /api/auth/register:
- *   post:
- *     summary: Регистрация нового пользователя
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *               - first_name
- *               - last_name
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               first_name:
- *                 type: string
- *               last_name:
- *                 type: string
- *     responses:
- *       201:
- *         description: Пользователь успешно зарегистрирован
- *       400:
- *         description: Ошибка валидации
- */
 router.post('/register', async (req, res) => {
   try {
     const { email, password, first_name, last_name } = req.body;
@@ -166,32 +133,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/auth/login:
- *   post:
- *     summary: Вход в систему
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Успешный вход
- *       401:
- *         description: Неверные учетные данные
- */
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -206,7 +147,7 @@ router.post('/login', async (req, res) => {
     }
 
     if (user.isBlocked) {
-      return res.status(403).json({ error: 'Ваш аккаунт заблокирован' });
+      return res.status(403).json({ error: 'Ваш аккаунт заблокирован. Обратитесь к администратору.' });
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
@@ -230,29 +171,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/auth/refresh:
- *   post:
- *     summary: Обновление токенов
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - refreshToken
- *             properties:
- *               refreshToken:
- *                 type: string
- *     responses:
- *       200:
- *         description: Токены успешно обновлены
- *       401:
- *         description: Недействительный refresh token
- */
 router.post('/refresh', (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -277,7 +195,6 @@ router.post('/refresh', (req, res) => {
         return res.status(401).json({ error: 'Пользователь не найден' });
       }
 
-      // Проверка, не заблокирован ли пользователь
       if (existingUser.isBlocked) {
         refreshTokens.delete(refreshToken);
         return res.status(403).json({ error: 'Ваш аккаунт заблокирован' });
@@ -300,27 +217,6 @@ router.post('/refresh', (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/auth/logout:
- *   post:
- *     summary: Выход из системы
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - refreshToken
- *             properties:
- *               refreshToken:
- *                 type: string
- *     responses:
- *       200:
- *         description: Успешный выход
- */
 router.post('/logout', (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -336,20 +232,6 @@ router.post('/logout', (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/auth/me:
- *   get:
- *     summary: Получение информации о текущем пользователе
- *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Информация о пользователе
- *       401:
- *         description: Не авторизован
- */
 router.get('/me', authenticateToken, (req, res) => {
   const user = users.find(u => u.id === req.user.id);
   if (!user) {
