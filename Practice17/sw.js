@@ -1,4 +1,4 @@
-const CACHE_NAME = 'task-manager-v4';
+const CACHE_NAME = 'task-manager-v5';
 const DYNAMIC_CACHE_NAME = 'dynamic-content-v2';
 
 const ASSETS = [
@@ -132,12 +132,12 @@ self.addEventListener('push', (event) => {
         options.actions = [
             {
                 action: 'snooze',
-                title: 'Snooze for 5 minutes',
+                title: 'Отложить на 5 минут',
                 icon: '/icons/launchericon-48x48.png'
             },
             {
                 action: 'close',
-                title: 'Close',
+                title: 'Закрыть',
                 icon: '/icons/launchericon-48x48.png'
             }
         ];
@@ -170,8 +170,8 @@ self.addEventListener('notificationclick', (event) => {
             .then(response => {
                 if (response.ok) {
                     console.log('[SW] Snooze successful');
-                    return self.registration.showNotification('Reminder snoozed', {
-                        body: 'You will be reminded again in 5 minutes',
+                    return self.registration.showNotification('Напоминание отложено', {
+                        body: 'Новое напоминание придет через 5 минут',
                         icon: '/icons/launchericon-192x192.png',
                         badge: '/icons/launchericon-48x48.png'
                     });

@@ -299,3 +299,79 @@ frontend/src/<br>
 └── styles/<br>
     └── App.scss           # Стили
 
+# Практические задания 13-17
+
+## Структура проекта
+
+front-back-practice1/<br>
+├── Practice13/ # Практическое задание 13<br>
+├── Practice14/ # Практическое задание 14<br>
+├── Practice15/ # Практическое задание 15<br>
+├── Practice16/ # Практическое задание 16<br>
+├── Practice17/ # Практическое задание 17<br>
+└── README.md<br>
+
+
+### №13: Service Worker
+- Регистрация Service Worker
+- кэширование статических ресурсов, работа приложения без интернета
+
+### №14: Web App Manifest
+- Создание manifest.json
+- Иконки для разных устройств
+- Установка приложения на экран
+
+### №15: HTTPS + App Shell
+- Настройка локального HTTPS (mkcert)
+- Архитектура App Shell
+- Динамическая загрузка страниц
+
+### №16: WebSocket + Push
+- Socket.IO для двусторонней связи
+- Push-уведомления при добавлении задач.
+
+### №17: Детализация Push
+- Форма с datetime-local, планирование напоминаний на сервере
+- Кнопка "Отложить на 5 минут" (*не работает в некоторых браузерах*)
+
+
+## Структура PWA
+task-manager-pwa/<br>
+├── server.js              # Node.js сервер<br>
+├── index.html             # App Shell<br>
+├── app.js                 # Клиентская логика<br>
+├── styles.css             # Стили<br>
+├── sw.js                  # Service Worker<br>
+├── manifest.json          # PWA манифест<br>
+├── content/<br>
+│   ├── home.html<br>
+│   └── about.html<br>
+└── icons/                 # Иконки PWA<br>
+
+## Установка и запуск
+
+### 1. Клонирование репозитория
+
+```
+git clone <repository-url>
+cd task-manager-pwa
+```
+2. Установка зависимостей
+```
+npm install
+```
+3. Генерация VAPID-ключей
+```
+npx web-push generate-vapid-keys
+```
+Скопируйте полученные ключи и вставьте их в файл server.js:
+```
+const vapidKeys = {
+    publicKey: 'ВАШ_ПУБЛИЧНЫЙ_КЛЮЧ',
+    privateKey: 'ВАШ_ПРИВАТНЫЙ_КЛЮЧ'
+};
+```
+4. Запуск сервера
+```
+node server.js
+```

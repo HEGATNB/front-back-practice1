@@ -63,7 +63,7 @@ function scheduleReminder(id, text, reminderTime) {
         subscriptions.forEach(sub => {
             webpush.sendNotification(sub, payload).catch(err => {
                 console.error('Push error:', err);
-                if (err.statusCode === 410 || err.statusCode === 404) {
+                if (err.statusCode === 410 || err.statusCode === 404 || err.statusCode === 410) {
                     subscriptions = subscriptions.filter(s => s.endpoint !== sub.endpoint);
                 }
             });
@@ -111,7 +111,7 @@ io.on('connection', (socket) => {
         subscriptions.forEach(sub => {
             webpush.sendNotification(sub, payload).catch(err => {
                 console.error('Push error:', err);
-                if (err.statusCode === 410 || err.statusCode === 404) {
+                if (err.statusCode === 410 || err.statusCode === 404 || err.statusCode === 410) {
                     subscriptions = subscriptions.filter(s => s.endpoint !== sub.endpoint);
                 }
             });
@@ -194,7 +194,7 @@ app.post('/snooze', (req, res) => {
         subscriptions.forEach(sub => {
             webpush.sendNotification(sub, payload).catch(err => {
                 console.error('Push error:', err);
-                if (err.statusCode === 410 || err.statusCode === 404) {
+                if (err.statusCode === 410 || err.statusCode === 404 || err.statusCode === 410) {
                     subscriptions = subscriptions.filter(s => s.endpoint !== sub.endpoint);
                 }
             });
