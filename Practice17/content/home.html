@@ -1,0 +1,61 @@
+<div class="home-content">
+    <!-- Обычная форма добавления задачи -->
+    <form id="task-form" class="task-form">
+        <div class="task-form__group">
+            <div class="task-form__input-wrapper">
+                <i class="fas fa-pen task-form__input-icon"></i>
+                <input
+                    type="text"
+                    id="task-input"
+                    class="task-form__input"
+                    placeholder="Добавить новую задачу..."
+                    required
+                >
+            </div>
+            <div class="task-form__date-wrapper">
+                <i class="fas fa-calendar-alt task-form__date-icon"></i>
+                <input
+                    type="date"
+                    id="task-date"
+                    class="task-form__date"
+                >
+            </div>
+            <button type="submit" class="task-form__button">
+                <i class="fas fa-plus"></i> Добавить
+            </button>
+        </div>
+    </form>
+
+    <!-- Новая форма для задачи с напоминанием -->
+    <form id="reminder-form" class="task-form reminder-form">
+        <h3 class="reminder-form__title">
+            <i class="fas fa-bell"></i> Задача с напоминанием
+        </h3>
+        <div class="task-form__group">
+            <div class="task-form__input-wrapper">
+                <i class="fas fa-pen task-form__input-icon"></i>
+                <input
+                    type="text"
+                    id="reminder-text"
+                    class="task-form__input"
+                    placeholder="Текст напоминания..."
+                    required
+                >
+            </div>
+            <div class="task-form__datetime-wrapper">
+                <i class="fas fa-clock task-form__datetime-icon"></i>
+                <input
+                    type="datetime-local"
+                    id="reminder-datetime"
+                    class="task-form__datetime"
+                    required
+                >
+            </div>
+            <button type="submit" class="task-form__button task-form__button--reminder">
+                <i class="fas fa-bell"></i> Добавить с напоминанием
+            </button>
+        </div>
+    </form>
+
+    <div id="task-list" class="task-list"></div>
+</div>
